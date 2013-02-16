@@ -11,6 +11,7 @@
 /**
  * Module dependencies.
  */
+try { require('coffee-script') } catch (e) {}
 var util = require('util');
 var fs = require('fs');
 var Benchmark = require('../');
@@ -41,11 +42,21 @@ if (argv.l) {
   _logstream = fs.createWriteStream(argv.l, {flags: 'a'});
 }
 var config = require(path.resolve(argv.config));
-if (!Array.isArray(config)) {
-  config = [config];
+var i, l;
+if ('function' == typeof config)
+  config(function(err, data){ config = data; preHandle() });
+else
+  preHandle();
+
+function preHandle() {
+  if (!Array.isArray(config)) {
+    config = [config];
+  }
+  i = 0;
+  l = config.length;
+  handleBm();
 }
-var i = 0;
-var l = config.length;
+
 function handleBm() {
   var bm = Benchmark.create(config[i++]);
   bm.on('piece', function(data) {
@@ -77,8 +88,6 @@ function handleBm() {
     bm.start();  
   }.bind(bm), 500);
 }
-handleBm();
-
 
 function print(data) {
   var testInfo = util.format('\nBenchmark test at %s:\n%s\n' + 
