@@ -11,6 +11,7 @@
 /**
  * Module dependencies.
  */
+try { require('coffee-script') } catch (e) {}
 var util = require('util');
 var fs = require('fs');
 var Benchmark = require('../');
